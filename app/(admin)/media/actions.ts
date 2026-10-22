@@ -3,8 +3,24 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireAdmin } from '@/lib/auth'
+import { captionImage } from '@/lib/gemini'
 
 export type FormState = { error?: string } | undefined
+
+export async function generateCaption(
+    imageUrl: string,
+    prompt: string
+): Promise<{ caption?: string; error?: string }> {
+  await requireAdmin()
+  if (!/^https?:\/\//i.test(imageUrl)) return { error: 'Add an image first.' }
+  if (!prompt.trim()) return { error: 'Write a prompt so the AI knows what to aim for.' }
+  if (prompt.length > 500) return { error: 'Prompt must be 500 characters or fewer.' }
+  try {
+    return { caption: await captionImage(imageUrl, prompt.trim()) }
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Caption generation failed.' }
+  }
+}
 
 function readFields(fd: FormData) {
   const text = String(fd.get('text') ?? '').trim()
