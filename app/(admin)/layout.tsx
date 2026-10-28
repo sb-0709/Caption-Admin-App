@@ -10,7 +10,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="shell">
       <aside className="sidebar">
         <div className="masthead">
-          <span className="masthead-kicker">Vol. 6 · Admin</span>
+          <span className="masthead-kicker">Vol. 7 · Admin</span>
           <span className="masthead-title">
             The Caption <em>Ledger</em>
           </span>

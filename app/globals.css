@@ -333,3 +333,44 @@ textarea.input { resize: vertical; }
   font-size: 12.5px;
 }
 .ai-note b { font: 600 10.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+
+/* ---------- week 7: grouped nav, generic tables & forms ---------- */
+.sidebar { overflow: hidden; }
+.nav { flex: 1; min-height: 0; overflow-y: auto; gap: 14px; margin-right: -8px; padding-right: 8px; }
+.nav-group { display: flex; flex-direction: column; gap: 1px; }
+.nav-group-title { padding: 0 10px 4px; font: 10.5px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: #8a8375; }
+.nav .nav-link { padding: 6px 10px; font-size: 14px; }
+
+.kpis-4 { grid-template-columns: repeat(4, 1fr); }
+.select { width: auto; min-width: 160px; }
+.toolbar .select { max-width: 200px; }
+.open-link { font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.open-link:hover { color: var(--accent); }
+.ref-link { text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 3px; }
+.ref-link:hover { color: var(--accent); }
+.pill.status-success { background: var(--up-soft); color: var(--up); }
+.pill.status-error { background: var(--down-soft); color: var(--down); }
+.pill.status-pending, .pill.status-app, .pill.status-admin, .pill.status-backfill { background: var(--paper-2); color: var(--ink-2); }
+.table-wrap.flat { border: 0; background: none; }
+.row-between { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+
+.details { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px 24px; margin: 0; }
+.details .wide { grid-column: 1 / -1; }
+.details dt { font: 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.details dd { margin: 0; }
+.pre { margin: 0; white-space: pre-wrap; font-family: var(--mono); font-size: 13px; background: var(--paper); padding: 10px 12px; border-radius: 4px; }
+.detail-img { max-width: 360px; width: 100%; border-radius: 4px; border: 1px solid var(--rule); }
+
+.row-form { display: flex; flex-direction: column; gap: 16px; max-width: 760px; }
+.check { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.check input { width: 16px; height: 16px; accent-color: var(--ink); }
+.image-field { display: grid; grid-template-columns: 200px 1fr; gap: 16px; }
+.image-field-preview { aspect-ratio: 4 / 3; border: 1px solid var(--rule); border-radius: 4px; background: var(--paper-2); overflow: hidden; display: grid; place-items: center; }
+.image-field-preview img { width: 100%; height: 100%; object-fit: cover; }
+.image-field-inputs { display: flex; flex-direction: column; gap: 8px; }
+
+@media (max-width: 1000px) { .kpis-4 { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 760px) {
+  .nav { flex-direction: column; max-height: 50vh; }
+  .image-field { grid-template-columns: 1fr; }
+}

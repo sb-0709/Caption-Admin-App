@@ -7,8 +7,16 @@ const OUTPUT_RULES =
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
+export type CaptionResult = {
+    text: string
+    model: string
+    inputTokens: number | null
+    outputTokens: number | null
+    finishReason: string | null
+}
+
 /** Downloads an image from a public URL and asks Gemini for one caption. */
-export async function captionImage(imageUrl: string, prompt: string): Promise<string> {
+export async function captionImage(imageUrl: string, prompt: string): Promise<CaptionResult> {
     const key = process.env.GEMINI_API_KEY
     if (!key) throw new Error('GEMINI_API_KEY is not set for this app.')
 
@@ -40,9 +48,18 @@ export async function captionImage(imageUrl: string, prompt: string): Promise<st
             )
             const data = await res.json().catch(() => ({}))
             if (res.ok) {
-                const text: string | undefined = data.candidates?.[0]?.content?.parts?.[0]?.text
+                const cand = data.candidates?.[0]
+                const text: string | undefined = cand?.content?.parts?.[0]?.text
                 const clean = text?.trim().replace(/^["“”*]+|["“”*]+$/g, '').trim()
-                if (clean) return clean
+                if (clean) {
+                    return {
+                        text: clean,
+                        model,
+                        inputTokens: data.usageMetadata?.promptTokenCount ?? null,
+                        outputTokens: data.usageMetadata?.candidatesTokenCount ?? null,
+                        finishReason: cand?.finishReason ?? null,
+                    }
+                }
                 lastError = 'Gemini returned an empty caption.'
                 break
             }

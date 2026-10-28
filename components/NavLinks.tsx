@@ -2,27 +2,40 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { RESOURCES } from '@/lib/resources'
 
-const LINKS = [
-  { href: '/', label: 'Overview', n: '01' },
-  { href: '/users', label: 'Users', n: '02' },
-  { href: '/media', label: 'Media', n: '03' },
-  { href: '/votes', label: 'Votes', n: '04' },
+const CORE = [
+  { href: '/', label: 'Overview' },
+  { href: '/users', label: 'Users' },
+  { href: '/media', label: 'AI media' },
+  { href: '/votes', label: 'Votes' },
+]
+
+const GROUPS = [
+  { title: 'Dashboard', links: CORE },
+  ...['Prompts', 'Models', 'Logs', 'Access', 'Assets'].map((g) => ({
+    title: g,
+    links: RESOURCES.filter((r) => r.group === g).map((r) => ({ href: `/data/${r.key}`, label: r.title })),
+  })),
 ]
 
 export default function NavLinks() {
   const path = usePathname()
   return (
-    <nav className="nav">
-      {LINKS.map((l) => {
-        const active = l.href === '/' ? path === '/' : path.startsWith(l.href)
-        return (
-          <Link key={l.href} href={l.href} className={active ? 'nav-link active' : 'nav-link'}>
-            <span className="nav-n">{l.n}</span>
-            {l.label}
-          </Link>
-        )
-      })}
-    </nav>
+      <nav className="nav">
+        {GROUPS.map((g) => (
+            <div key={g.title} className="nav-group">
+              <span className="nav-group-title">{g.title}</span>
+              {g.links.map((l) => {
+                const active = l.href === '/' ? path === '/' : path === l.href || path.startsWith(l.href + '/')
+                return (
+                    <Link key={l.href} href={l.href} className={active ? 'nav-link active' : 'nav-link'}>
+                      {l.label}
+                    </Link>
+                )
+              })}
+            </div>
+        ))}
+      </nav>
   )
 }

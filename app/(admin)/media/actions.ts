@@ -11,14 +11,50 @@ export async function generateCaption(
     imageUrl: string,
     prompt: string
 ): Promise<{ caption?: string; error?: string }> {
-  await requireAdmin()
+  const { supabase, user } = await requireAdmin()
   if (!/^https?:\/\//i.test(imageUrl)) return { error: 'Add an image first.' }
   if (!prompt.trim()) return { error: 'Write a prompt so the AI knows what to aim for.' }
   if (prompt.length > 500) return { error: 'Prompt must be 500 characters or fewer.' }
+
+  // Observability: log the request before calling the model...
+  const started = Date.now()
+  const { data: req } = await supabase
+      .from('generation_requests')
+      .insert({ user_id: user.id, source: 'admin', image_url: imageUrl, prompt: prompt.trim(), status: 'pending' })
+      .select('id')
+      .single()
+
   try {
-    return { caption: await captionImage(imageUrl, prompt.trim()) }
+    const result = await captionImage(imageUrl, prompt.trim())
+
+    // ...then record the outcome and the raw model response.
+    if (req) {
+      const { data: model } = await supabase.from('llm_models').select('id').eq('model_id', result.model).maybeSingle()
+      await Promise.all([
+        supabase
+            .from('generation_requests')
+            .update({ status: 'success', latency_ms: Date.now() - started, model_id: model?.id ?? null })
+            .eq('id', req.id),
+        supabase.from('llm_responses').insert({
+          request_id: req.id,
+          model_id: model?.id ?? null,
+          response_text: result.text,
+          input_tokens: result.inputTokens,
+          output_tokens: result.outputTokens,
+          finish_reason: result.finishReason,
+        }),
+      ])
+    }
+    return { caption: result.text }
   } catch (e) {
-    return { error: e instanceof Error ? e.message : 'Caption generation failed.' }
+    const message = e instanceof Error ? e.message : 'Caption generation failed.'
+    if (req) {
+      await supabase
+          .from('generation_requests')
+          .update({ status: 'error', error_message: message, latency_ms: Date.now() - started })
+          .eq('id', req.id)
+    }
+    return { error: message }
   }
 }
 
