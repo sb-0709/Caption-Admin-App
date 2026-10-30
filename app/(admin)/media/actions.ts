@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireAdmin } from '@/lib/auth'
 import { captionImage } from '@/lib/gemini'
+import { buildPromptContext } from '@/lib/promptContext'
 
 export type FormState = { error?: string } | undefined
 
@@ -25,7 +26,9 @@ export async function generateCaption(
       .single()
 
   try {
-    const result = await captionImage(imageUrl, prompt.trim())
+    // Teach the model our terms and show it example captions before it writes.
+    const context = await buildPromptContext(supabase)
+    const result = await captionImage(imageUrl, prompt.trim(), context)
 
     // ...then record the outcome and the raw model response.
     if (req) {

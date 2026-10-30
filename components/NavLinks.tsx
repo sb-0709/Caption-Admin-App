@@ -13,7 +13,7 @@ const CORE = [
 
 const GROUPS = [
   { title: 'Dashboard', links: CORE },
-  ...['Prompts', 'Models', 'Logs', 'Access', 'Assets'].map((g) => ({
+  ...['Prompts', 'Models', 'Logs', 'Access'].map((g) => ({
     title: g,
     links: RESOURCES.filter((r) => r.group === g).map((r) => ({ href: `/data/${r.key}`, label: r.title })),
   })),

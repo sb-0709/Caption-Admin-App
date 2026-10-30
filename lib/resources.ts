@@ -102,12 +102,12 @@ export const RESOURCES: Resource[] = [
         title: 'Terms',
         singular: 'term',
         group: 'Prompts',
-        description: 'Glossary of words and phrases used in prompts and the app.',
+        description: 'Words the AI might not know (campus places, slang, acronyms). Sent to Gemini with every caption request.',
         ops: { create: true, update: true, delete: true },
         fields: [
-            { name: 'term', label: 'Term', type: 'text', required: true, list: true },
-            { name: 'definition', label: 'Definition', type: 'textarea', required: true, list: true },
-            { name: 'example', label: 'Example', type: 'textarea', list: true },
+            { name: 'term', label: 'Term', type: 'text', required: true, list: true, help: 'e.g. John Jay' },
+            { name: 'definition', label: 'Meaning', type: 'textarea', required: true, list: true, help: 'Explain it the way you would to someone new' },
+            { name: 'example', label: 'Used in a sentence', type: 'textarea', list: true },
             created,
         ],
         order: { column: 'term', ascending: true },
@@ -119,7 +119,7 @@ export const RESOURCES: Resource[] = [
         title: 'AI generation examples',
         singular: 'example',
         group: 'Prompts',
-        description: 'Hand-picked prompt → caption pairs that show the AI what a good caption looks like.',
+        description: 'Examples of good AI output. Active ones are shown to Gemini as style references.',
         ops: { create: true, update: true, delete: true },
         fields: [
             { name: 'image_url', label: 'Image', type: 'image', list: true },
@@ -255,26 +255,6 @@ export const RESOURCES: Resource[] = [
         ],
         order: { column: 'email', ascending: true },
         search: ['email', 'note'],
-    },
-
-    // ---------------- Assets ----------------
-    {
-        key: 'images',
-        table: 'images',
-        title: 'Images',
-        singular: 'image',
-        group: 'Assets',
-        description: 'Image library. Uploads go to the Supabase “media” bucket.',
-        ops: { create: true, update: true, delete: true },
-        fields: [
-            { name: 'url', label: 'Image', type: 'image', required: true, list: true },
-            { name: 'description', label: 'Description', type: 'textarea', list: true },
-            { name: 'storage_path', label: 'Storage path', type: 'text', editable: false },
-            { name: 'uploaded_by', label: 'Uploaded by', type: 'ref', ref: profileRef, list: true, editable: false },
-            created,
-        ],
-        order: { column: 'created_at', ascending: false },
-        search: ['description'],
     },
 ]
 

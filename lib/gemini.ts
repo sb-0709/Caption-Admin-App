@@ -16,7 +16,7 @@ export type CaptionResult = {
 }
 
 /** Downloads an image from a public URL and asks Gemini for one caption. */
-export async function captionImage(imageUrl: string, prompt: string): Promise<CaptionResult> {
+export async function captionImage(imageUrl: string, prompt: string, context = ''): Promise<CaptionResult> {
     const key = process.env.GEMINI_API_KEY
     if (!key) throw new Error('GEMINI_API_KEY is not set for this app.')
 
@@ -31,7 +31,7 @@ export async function captionImage(imageUrl: string, prompt: string): Promise<Ca
         contents: [
             {
                 parts: [
-                    { text: `${prompt}\n\n${OUTPUT_RULES}` },
+                    { text: [context, prompt, OUTPUT_RULES].filter(Boolean).join('\n\n') },
                     { inline_data: { mime_type: mime, data: bytes.toString('base64') } },
                 ],
             },
